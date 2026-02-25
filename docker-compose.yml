@@ -1,0 +1,18 @@
+services:
+  droneautocuts:
+    build: .
+    container_name: droneautocuts
+    runtime: nvidia
+    deploy:
+       resources:
+         reservations:
+           devices:
+             - driver: nvidia
+               count: all
+               capabilities: [gpu]
+    environment:
+      - USE_GPU=1
+    volumes:
+      - ./input:/app/input
+      - ./output:/app/output
+      - ./normalized:/app/normalized

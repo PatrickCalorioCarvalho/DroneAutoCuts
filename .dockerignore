@@ -1,0 +1,25 @@
+# Ignore Python cache and environment
+__pycache__/
+*.py[cod]
+.env
+.env.*
+
+# Ignore output directories (volumes)
+output/
+normalized/
+
+# Ignore dataset/input and large media files
+input/
+
+# Ignore YOLO weights cache
+yolov8n.pt
+
+# Git and Docker
+.git
+.gitignore
+
+# Docker build artifacts
+*.log
+
+# Misc
+.vscode/
