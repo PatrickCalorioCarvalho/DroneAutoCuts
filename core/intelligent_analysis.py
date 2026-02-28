@@ -4,15 +4,27 @@ import torch
 from ultralytics import YOLO
 from core.camera_motion_analysis import analyze_camera_motion
 
-# carregar YOLO uma única vez e mover para GPU se disponível
-device = "cuda" if torch.cuda.is_available() else "cpu"
-model = YOLO("yolov8n.pt")
-if device == "cuda":
+# carregar YOLO uma única vez
+# Forçar CPU se houver erro CUDA para evitar "no kernel image" errors
+device = "cpu"  # Default para CPU (mais estável em containers)
+
+# Tentar GPU apenas se disponível E se conseguir fazer inference
+if torch.cuda.is_available():
     try:
-        model.to(device)
+        model = YOLO("yolov8n.pt")
+        model.to("cuda")
+        # Teste rápido: tentar inference em GPU
+        test_frame = np.zeros((640, 640, 3), dtype=np.uint8)
+        _ = model(test_frame, verbose=False, device="cuda")
+        device = "cuda"
         print("⛩  YOLO carregado na GPU")
-    except Exception:
-        print("⚠️ Não foi possível mover o modelo para GPU, continuando na CPU")
+    except Exception as e:
+        print(f"⚠️  CUDA unavailable para YOLO: {type(e).__name__}")
+        print("   Continuando com YOLO na CPU")
+        device = "cpu"
+
+model = YOLO("yolov8n.pt")
+model.to(device)
 
 
 def sharpness_score(frame):
@@ -26,7 +38,7 @@ def brightness_score(frame):
 
 
 def people_score(frame):
-    results = model(frame, verbose=False)
+    results = model(frame, verbose=False, device=device)
     count = 0
 
     for r in results:

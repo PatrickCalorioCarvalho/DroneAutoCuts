@@ -5,14 +5,14 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from core.scene_detection import detect_scenes
 #from core.motion_analysis import calculate_motion_score
-from core.highlight_builder import build_highlight, export_vertical
+from core.highlight_builder import (
+    build_highlight, export_vertical, run_ffmpeg,
+    FFMPEG_CODEC, FFMPEG_HWACCEL_ARGS, get_encoding_args
+)
 from core.intelligent_analysis import analyze_scene
 
 # ------------------------------------------------------------------
-# hardware-acceleration configuration (set env USE_GPU=1 when ready)
-USE_GPU = os.getenv("USE_GPU", "0") == "1"
-FFMPEG_CODEC = "h264_nvenc" if USE_GPU else "libx264"
-FFMPEG_HWACCEL_ARGS = ["-hwaccel", "cuda"] if USE_GPU else []
+# Usar configuração de encoder de highlight_builder (com fallback automático)
 # ------------------------------------------------------------------
 
 INPUT_FOLDER = "input"
@@ -38,12 +38,11 @@ def normalize_video(input_path):
         "-vf", "scale=1920:1080",
         "-r", "30",
         "-c:v", FFMPEG_CODEC,
-        "-preset", "slow",   # melhor qualidade (mude para "fast" se quiser mais velocidade)
-        "-crf", "18",        # crf menor para mais nitidez
+        *get_encoding_args(FFMPEG_CODEC),
         output_path
     ]
 
-    subprocess.run(command, check=True)
+    run_ffmpeg(command, description=f"normalizing {input_path}")
     print(f"✅ Normalização concluída: {output_path}")
     return output_path
 
@@ -68,7 +67,7 @@ def concatenate_all_videos(video_list, output_path):
         output_path
     ]
 
-    subprocess.run(command, check=True)
+    run_ffmpeg(command, description="concatenating all videos")
     os.remove(list_file)
     print("✅ Vídeos concatenados com sucesso")
 
@@ -117,8 +116,8 @@ def main():
     highlight_path = os.path.join(OUTPUT_FOLDER, "highlight_horizontal.mp4")
     build_highlight(merged_video, selected, highlight_path)
 
-    vertical_path = os.path.join(OUTPUT_FOLDER, "highlight_tiktok_9x16.mp4")
-    export_vertical(highlight_path, vertical_path)
+    #vertical_path = os.path.join(OUTPUT_FOLDER, "highlight_tiktok_9x16.mp4")
+    #export_vertical(highlight_path, vertical_path)
     print("📁 Todos os arquivos foram gerados em", OUTPUT_FOLDER)
 
     print("Finalizado com sucesso 🚀")
@@ -126,3 +125,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+      git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
