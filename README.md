@@ -36,14 +36,14 @@ Gerador automático de highlights para filmagens de drone.
 
 ```mermaid
 flowchart LR
-    A[Vídeos de entrada] --> B[NORMALIZE (1920x1080,30fps)]
-    B --> C[MERGE]
-    C --> D[DETECT SCENES]
-    D --> E[ANALYZE SCENES (YOLO, nitidez, brilho, câmera)]
-    E --> F[seleção top 20%]
-    F --> G[BUILD HIGHLIGHT (cortes, LUT, aceleração)]
-    G --> H[EXPORT VERTICAL]
-    H --> I[Saída final]
+    A["Videos de entrada"] --> B["NORMALIZE 1920x1080 30fps"]
+    B --> C["MERGE"]
+    C --> D["DETECT SCENES"]
+    D --> E["ANALYZE SCENES YOLO nitidez brilho camera"]
+    E --> F["Selecao top 20"]
+    F --> G["BUILD HIGHLIGHT cortes LUT aceleracao"]
+    G --> H["EXPORT VERTICAL"]
+    H --> I["Saida final"]
 ```
 
 Sinta-se à vontade para ajustar configurações e migrar para um host com GPU quando quiser!
